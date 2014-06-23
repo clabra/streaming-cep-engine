@@ -34,6 +34,7 @@ import org.apache.http.util.EntityUtils
 import com.mongodb._
 import com.stratio.streaming.zookeeper.ZookeeperConsumer
 import com.stratio.streaming.commons.streams.StratioStream
+import com.google.gson.Gson
 
 
 class StratioStreamingIntegrationTests
