@@ -32,14 +32,14 @@ import com.stratio.streaming.serializer.Serializer;
 
 public class CallbackService {
 
-    private final Producer<String, String> producer;
-    private final Serializer<String, StratioStreamingMessage> kafkaToJavaSerializer;
+    private final Producer<String, byte[]> producer;
+    private final Serializer<byte[], StratioStreamingMessage> kafkaToJavaSerializer;
     private final Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer;
 
     private final Map<String, ActionControllerCallback> referencedCallbacks;
 
-    public CallbackService(Producer<String, String> producer,
-            Serializer<String, StratioStreamingMessage> kafkaToJavaSerializer,
+    public CallbackService(Producer<String, byte[]> producer,
+            Serializer<byte[], StratioStreamingMessage> kafkaToJavaSerializer,
             Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer) {
         this.producer = producer;
         this.kafkaToJavaSerializer = kafkaToJavaSerializer;

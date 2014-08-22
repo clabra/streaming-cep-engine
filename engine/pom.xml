@@ -66,6 +66,11 @@
 			<version>2.2.4</version>
 		</dependency>
 		<dependency>
+			<groupId>com.esotericsoftware.kryo</groupId>
+			<artifactId>kryo</artifactId>
+			<version>2.24.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-streaming-kafka_2.10</artifactId>
 			<version>1.0.0</version>

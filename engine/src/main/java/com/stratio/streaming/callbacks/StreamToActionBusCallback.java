@@ -37,13 +37,13 @@ public class StreamToActionBusCallback extends ActionControllerCallback {
 
     private final String streamName;
 
-    private final Producer<String, String> producer;
+    private final Producer<String, byte[]> producer;
 
-    private final Serializer<String, StratioStreamingMessage> kafkaToJavaSerializer;
+    private final Serializer<byte[], StratioStreamingMessage> kafkaToJavaSerializer;
     private final Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer;
 
     public StreamToActionBusCallback(Set<StreamAction> activeActions, String streamName,
-            Producer<String, String> producer, Serializer<String, StratioStreamingMessage> kafkaToJavaSerializer,
+            Producer<String, byte[]> producer, Serializer<byte[], StratioStreamingMessage> kafkaToJavaSerializer,
             Serializer<StratioStreamingMessage, Event> javaToSiddhiSerializer) {
         super(activeActions);
         this.streamName = streamName;
@@ -57,14 +57,14 @@ public class StreamToActionBusCallback extends ActionControllerCallback {
         if (log.isDebugEnabled()) {
             log.debug("Receiving {} events from stream {}", inEvents.length, streamName);
         }
-        List<KeyedMessage<String, String>> messages = new ArrayList<>();
+        List<KeyedMessage<String, byte[]>> messages = new ArrayList<>();
         for (Event event : inEvents) {
             StratioStreamingMessage messageObject = javaToSiddhiSerializer.deserialize(event);
 
             messageObject.setStreamName(streamName);
             messageObject.setActiveActions(this.activeActions);
 
-            messages.add(new KeyedMessage<String, String>(InternalTopic.TOPIC_ACTION.getTopicName(),
+            messages.add(new KeyedMessage<String, byte[]>(InternalTopic.TOPIC_ACTION.getTopicName(),
                     kafkaToJavaSerializer.deserialize(messageObject)));
         }
 

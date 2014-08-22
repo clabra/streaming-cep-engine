@@ -26,10 +26,10 @@ import org.wso2.siddhi.query.api.definition.Attribute.Type;
 import com.stratio.streaming.commons.constants.ColumnType;
 import com.stratio.streaming.commons.messages.ColumnNameTypeValue;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
-import com.stratio.streaming.serializer.Serializer;
+import com.stratio.streaming.serializer.ListElementSerializerHandler;
 import com.stratio.streaming.service.StreamMetadataService;
 
-public class JavaToSiddhiSerializer implements Serializer<StratioStreamingMessage, Event> {
+public class JavaToSiddhiSerializer extends ListElementSerializerHandler<StratioStreamingMessage, Event> {
 
     private static final long serialVersionUID = 1694881934063941893L;
 
@@ -58,28 +58,6 @@ public class JavaToSiddhiSerializer implements Serializer<StratioStreamingMessag
             columns.add(new ColumnNameTypeValue(attribute.getName(), encodeSiddhiType(attribute.getType()), data));
         }
         return new StratioStreamingMessage(object.getStreamId(), object.getTimeStamp(), columns);
-    }
-
-    @Override
-    public List<Event> serialize(List<StratioStreamingMessage> object) {
-        List<Event> result = new ArrayList<>();
-        if (object != null) {
-            for (StratioStreamingMessage message : object) {
-                result.add(serialize(message));
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<StratioStreamingMessage> deserialize(List<Event> object) {
-        List<StratioStreamingMessage> result = new ArrayList<>();
-        if (object != null) {
-            for (Event event : object) {
-                result.add(deserialize(event));
-            }
-        }
-        return result;
     }
 
     private ColumnType encodeSiddhiType(Type type) {

@@ -29,9 +29,11 @@ import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.dao.StreamStatusDao;
 import com.stratio.streaming.dao.StreamingFailoverDao;
 import com.stratio.streaming.factory.GsonFactory;
+import com.stratio.streaming.factory.KryoFactory;
 import com.stratio.streaming.serializer.Serializer;
 import com.stratio.streaming.serializer.impl.JavaToSiddhiSerializer;
-import com.stratio.streaming.serializer.impl.KafkaToJavaSerializer;
+import com.stratio.streaming.serializer.impl.KafkaByteArrayToJavaSerializer;
+import com.stratio.streaming.serializer.impl.KafkaJsonToJavaSerializer;
 import com.stratio.streaming.service.CallbackService;
 import com.stratio.streaming.service.StreamMetadataService;
 import com.stratio.streaming.service.StreamOperationService;
@@ -53,7 +55,7 @@ public class ServiceConfiguration {
     private StreamingFailoverDao streamingFailoverDao;
 
     @Autowired
-    private Producer<String, String> producer;
+    private Producer<String, byte[]> producer;
 
     @Bean
     public StreamOperationService streamOperationService() {
@@ -67,7 +69,7 @@ public class ServiceConfiguration {
 
     @Bean
     public CallbackService callbackService() {
-        return new CallbackService(producer, kafkaToJavaSerializer(), javaToSiddhiSerializer());
+        return new CallbackService(producer, kafkaByteArrayToJavaSerializer(), javaToSiddhiSerializer());
     }
 
     @Bean
@@ -76,8 +78,13 @@ public class ServiceConfiguration {
     }
 
     @Bean
-    public Serializer<String, StratioStreamingMessage> kafkaToJavaSerializer() {
-        return new KafkaToJavaSerializer(GsonFactory.getInstance());
+    public Serializer<String, StratioStreamingMessage> kafkaJsonToJavaSerializer() {
+        return new KafkaJsonToJavaSerializer(GsonFactory.getInstance());
+    }
+
+    @Bean
+    public Serializer<byte[], StratioStreamingMessage> kafkaByteArrayToJavaSerializer() {
+        return new KafkaByteArrayToJavaSerializer(KryoFactory.getInstance());
     }
 
     @Bean

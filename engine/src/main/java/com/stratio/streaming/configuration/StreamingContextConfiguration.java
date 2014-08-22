@@ -18,6 +18,8 @@ package com.stratio.streaming.configuration;
 import java.util.HashMap;
 import java.util.Map;
 
+import kafka.serializer.StringDecoder;
+
 import org.apache.spark.SparkConf;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaDStream;
@@ -55,7 +57,7 @@ import com.stratio.streaming.functions.dml.InsertIntoStreamFunction;
 import com.stratio.streaming.functions.dml.ListStreamsFunction;
 import com.stratio.streaming.functions.messages.FilterMessagesByOperationFunction;
 import com.stratio.streaming.functions.messages.KeepPayloadFromMessageFunction;
-import com.stratio.streaming.serializer.impl.KafkaToJavaSerializer;
+import com.stratio.streaming.serializer.kafka.impl.KryoStratioStreamingMessageDecoder;
 import com.stratio.streaming.service.StreamOperationService;
 
 @Configuration
@@ -69,9 +71,6 @@ public class StreamingContextConfiguration {
 
     @Autowired
     private StreamOperationService streamOperationService;
-
-    @Autowired
-    private KafkaToJavaSerializer kafkaToJavaSerializer;
 
     private JavaStreamingContext create(String streamingContextName, int port, long streamingBatchTime, String sparkHost) {
         SparkConf conf = new SparkConf();
@@ -271,11 +270,15 @@ public class StreamingContextConfiguration {
         JavaStreamingContext context = this.create("stratio-streaming-process", 4042,
                 configurationContext.getStreamingBatchTime(), configurationContext.getSparkHost());
 
-        Map<String, Integer> topicActionMap = new HashMap<String, Integer>();
+        Map<String, Integer> topicActionMap = new HashMap<>();
         topicActionMap.put(InternalTopic.TOPIC_ACTION.getTopicName(), 1);
 
-        JavaPairDStream<String, String> dataDstream = KafkaUtils.createStream(context,
-                configurationContext.getZookeeperHostsQuorum(), BUS.STREAMING_GROUP_ID, topicActionMap);
+        Map<String, String> kafkaParams = new HashMap<>();
+        kafkaParams.put("zookeeper.connect", configurationContext.getZookeeperHostsQuorum());
+        kafkaParams.put("group.id", BUS.STREAMING_GROUP_ID);
+        JavaPairDStream<String, StratioStreamingMessage> dataDstream = KafkaUtils.createStream(context, String.class,
+                StratioStreamingMessage.class, StringDecoder.class, KryoStratioStreamingMessageDecoder.class,
+                kafkaParams, topicActionMap, KafkaUtils.createStream$default$5());
 
         JavaDStream<StratioStreamingMessage> parsedDataDstream = dataDstream.map(new SerializerFunction());
 

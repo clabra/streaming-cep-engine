@@ -31,7 +31,7 @@ public class KafkaConfiguration {
     private ConfigurationContext configurationContext;
 
     @Bean
-    public Producer<String, String> producer() {
+    public Producer<String, String> stringProducer() {
         Properties properties = new Properties();
 
         properties.put("serializer.class", "kafka.serializer.StringEncoder");
@@ -39,6 +39,17 @@ public class KafkaConfiguration {
         properties.put("producer.type", "async");
 
         return new Producer<String, String>(new ProducerConfig(properties));
+    }
+
+    @Bean
+    public Producer<String, byte[]> byteProducer() {
+        Properties properties = new Properties();
+
+        properties.put("serializer.class", "kafka.serializer.DefaultEncoder");
+        properties.put("metadata.broker.list", configurationContext.getKafkaHostsQuorum());
+        properties.put("producer.type", "async");
+
+        return new Producer<String, byte[]>(new ProducerConfig(properties));
     }
 
 }

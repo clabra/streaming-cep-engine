@@ -26,14 +26,14 @@ import kafka.producer.ProducerConfig;
 import com.stratio.streaming.commons.messages.StratioStreamingMessage;
 import com.stratio.streaming.factory.GsonFactory;
 import com.stratio.streaming.serializer.Serializer;
-import com.stratio.streaming.serializer.impl.KafkaToJavaSerializer;
+import com.stratio.streaming.serializer.impl.KafkaJsonToJavaSerializer;
 
 public class SendToKafkaActionExecutionFunction extends BaseActionExecutionFunction {
 
     private static final long serialVersionUID = -1661238643911306344L;
 
     private Producer<String, String> producer;
-    private KafkaToJavaSerializer kafkaToJavaSerializer;
+    private KafkaJsonToJavaSerializer kafkaToJavaSerializer;
 
     private final String kafkaQuorum;
 
@@ -53,7 +53,7 @@ public class SendToKafkaActionExecutionFunction extends BaseActionExecutionFunct
 
     private Serializer<String, StratioStreamingMessage> getSerializer() {
         if (kafkaToJavaSerializer == null) {
-            kafkaToJavaSerializer = new KafkaToJavaSerializer(GsonFactory.getInstance());
+            kafkaToJavaSerializer = new KafkaJsonToJavaSerializer(GsonFactory.getInstance());
         }
         return kafkaToJavaSerializer;
     }
