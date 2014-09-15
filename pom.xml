@@ -32,6 +32,7 @@
 		<module>shell</module>
 		<module>siddhi</module>
 		<module>examples</module>
+		<module>benchmark</module>
 	</modules>
 	<licenses>
 		<license>
@@ -71,7 +72,7 @@
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
-					</execution>					
+					</execution>
 				</executions>
 			</plugin>
 		</plugins>
