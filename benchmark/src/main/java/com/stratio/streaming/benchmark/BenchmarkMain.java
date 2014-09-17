@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.stratio.streaming.benchmark.exception.BenchmarkException;
+import com.stratio.streaming.benchmark.impl.ALotOfQueriesBenchmark;
+import com.stratio.streaming.benchmark.impl.BaseSimpleInOutBenchmark;
 import com.stratio.streaming.benchmark.impl.OneStreamListenBenchmark;
 import com.stratio.streaming.benchmark.impl.SimpleCountQueryBenchmark;
 import com.stratio.streaming.benchmark.impl.SimpleMaxQueryBenchmark;
@@ -26,12 +28,13 @@ public class BenchmarkMain {
     /*
      * , 100000 , 500000
      */};
-    public static Integer iteratees = 5;
+    public static Integer iteratees = 1;
 
-    static List<Benchmark> benchmarks = Arrays.asList((Benchmark) new OneStreamListenBenchmark(kafkaHost, kafkaPort,
+    static List<BaseSimpleInOutBenchmark> benchmarks = Arrays.asList(new OneStreamListenBenchmark(kafkaHost, kafkaPort,
             zookeeperHost, zookeeperPort), new SimplestQueryBenchmark(kafkaHost, kafkaPort, zookeeperHost,
-            zookeeperPort), new SimpleCountQueryBenchmark(kafkaHost, kafkaPort, zookeeperHost, zookeeperPort),
-            new SimpleMaxQueryBenchmark(kafkaHost, kafkaPort, zookeeperHost, zookeeperPort));
+            zookeeperPort), new SimpleMaxQueryBenchmark(kafkaHost, kafkaPort, zookeeperHost, zookeeperPort),
+            new SimpleCountQueryBenchmark(kafkaHost, kafkaPort, zookeeperHost, zookeeperPort),
+            new ALotOfQueriesBenchmark(kafkaHost, kafkaPort, zookeeperHost, zookeeperPort));
 
     private static Logger log = LoggerFactory.getLogger(BenchmarkMain.class);
 
@@ -44,6 +47,7 @@ public class BenchmarkMain {
                     final String metricName = MetricRegistry
                             .name(benchmark.getClass(), String.valueOf(elements), "req");
                     try {
+                        log.info("Processing {} events", elements);
                         final Timer processingTime = metrics.timer(metricName);
 
                         benchmark.setup(elements);
@@ -54,7 +58,7 @@ public class BenchmarkMain {
                         benchmark.process();
                         context.stop();
                         benchmark.tearDown();
-                        log.info("Processing {} events forMeasurement {} in {}", elements, metricName, processingTime
+                        log.info("Processed {} events forMeasurement {} in {}", elements, metricName, processingTime
                                 .getSnapshot().getMedian());
                     } catch (BenchmarkException e) {
                         log.error("Error processing " + metricName, e);
